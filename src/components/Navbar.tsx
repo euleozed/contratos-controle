@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,13 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, ChevronDown, Menu, User } from 'lucide-react';
+import { Bell, ChevronDown, Menu, Search, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Skip navbar on login and register pages
   if (['/login', '/register'].includes(location.pathname)) {
@@ -25,21 +27,57 @@ const Navbar = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-4">
-          <SidebarTrigger className="md:hidden">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+      <div className="flex h-16 items-center px-4 md:px-6">
+        <div className="flex items-center gap-2 md:gap-4 md:hidden">
+          <SidebarTrigger>
             <Menu className="h-5 w-5" />
           </SidebarTrigger>
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-xl font-semibold tracking-tight">AdminContracts</span>
+            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+              SC
+            </div>
+            <span className="text-lg font-medium">App Contratos</span>
           </Link>
         </div>
         
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" aria-label="Notifications">
-            <Bell className="h-5 w-5" />
-          </Button>
+        <div className="hidden md:flex md:items-center md:gap-2 md:ml-6">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Pesquisar contratos, empenhos..."
+              className="w-full pl-9 rounded-full bg-gray-50 border-gray-200"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        <div className="ml-auto flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative" aria-label="Notificações">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-500 text-[10px] font-bold text-white flex items-center justify-center">
+                  2
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel>Notificações</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="max-h-[300px] overflow-auto">
+                <DropdownMenuItem className="flex flex-col items-start p-3">
+                  <div className="font-medium">Contrato prestes a expirar</div>
+                  <div className="text-sm text-gray-500">Contrato #2024-001 expira em 7 dias</div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex flex-col items-start p-3">
+                  <div className="font-medium">Nota fiscal recebida</div>
+                  <div className="text-sm text-gray-500">Nova nota fiscal #123456 registrada</div>
+                </DropdownMenuItem>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Contract } from '@/lib/data';
 
 // Define column type to be used with tables
 export interface TableColumn<T> {
@@ -56,16 +55,20 @@ const TableWrapper = <T extends {}>({
                   }`}
                   onClick={() => onRowClick && onRowClick(row)}
                 >
-                  {columns.map((column, colIndex) => (
-                    <td
-                      key={`${rowIndex}-${colIndex}`}
-                      className={`px-4 py-3 text-sm ${column.className || ''}`}
-                    >
-                      {typeof column.accessorKey === 'function'
-                        ? column.accessorKey(row)
-                        : row[column.accessorKey as keyof T]}
-                    </td>
-                  ))}
+                  {columns.map((column, colIndex) => {
+                    const cellContent = typeof column.accessorKey === 'function'
+                      ? column.accessorKey(row)
+                      : row[column.accessorKey as keyof T] as React.ReactNode;
+                      
+                    return (
+                      <td
+                        key={`${rowIndex}-${colIndex}`}
+                        className={`px-4 py-3 text-sm ${column.className || ''}`}
+                      >
+                        {cellContent}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}
