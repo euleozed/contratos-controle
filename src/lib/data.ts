@@ -88,16 +88,29 @@ export const departments: Department[] = [
   },
 ];
 
+// Contract types
+export type ContractType = 
+  | "Credenciamento"
+  | "Dispensa em Razão do Valor"
+  | "Emergencial"
+  | "Inexigibilidade"
+  | "Licitatório"
+  | "Dispensa - Locação de Imóveis";
+
 // Contracts
 export interface Contract {
   id: string;
   number: string;
+  processNumber?: string;
   supplier: Supplier;
   department: Department;
   value: number;
+  monthlyValue?: number;
+  contractType?: ContractType;
   startDate: string;
   endDate: string;
   status: 'active' | 'expired' | 'pending' | 'canceled';
+  object?: string;
   description: string;
   createdAt: string;
 }
@@ -106,37 +119,49 @@ export const contracts: Contract[] = [
   {
     id: generateId(),
     number: "2023/001",
+    processNumber: "PROC-2023/001",
     supplier: suppliers[0],
     department: departments[0],
     value: 250000,
+    monthlyValue: 20833,
+    contractType: "Licitatório",
     startDate: format(new Date(2023, 1, 1), "yyyy-MM-dd"),
     endDate: format(new Date(2024, 1, 1), "yyyy-MM-dd"),
     status: "active",
-    description: "Contrato de manutenção de servidores",
+    object: "Manutenção preventiva e corretiva de servidores e infraestrutura de TI",
+    description: "Contrato de manutenção de servidores e equipamentos de TI incluindo suporte 24/7",
     createdAt: format(new Date(2023, 0, 15), "yyyy-MM-dd"),
   },
   {
     id: generateId(),
     number: "2023/002",
+    processNumber: "PROC-2023/002",
     supplier: suppliers[1],
     department: departments[1],
     value: 750000,
+    monthlyValue: 62500,
+    contractType: "Licitatório",
     startDate: format(new Date(2023, 2, 1), "yyyy-MM-dd"),
     endDate: format(new Date(2023, 11, 31), "yyyy-MM-dd"),
     status: "active",
-    description: "Construção de nova sede administrativa",
+    object: "Construção e reforma da nova sede administrativa",
+    description: "Construção de nova sede administrativa incluindo serviços de alvenaria, hidráulica e elétrica",
     createdAt: format(new Date(2023, 1, 20), "yyyy-MM-dd"),
   },
   {
     id: generateId(),
     number: "2023/003",
+    processNumber: "PROC-2023/003",
     supplier: suppliers[2],
     department: departments[2],
     value: 120000,
+    monthlyValue: 10000,
+    contractType: "Dispensa em Razão do Valor",
     startDate: format(new Date(2023, 3, 1), "yyyy-MM-dd"),
     endDate: format(new Date(2023, 9, 30), "yyyy-MM-dd"),
     status: "expired",
-    description: "Serviços de limpeza e copa",
+    object: "Serviços de limpeza e manutenção predial",
+    description: "Serviços de limpeza e copa para o edifício sede",
     createdAt: format(new Date(2023, 2, 15), "yyyy-MM-dd"),
   },
 ];

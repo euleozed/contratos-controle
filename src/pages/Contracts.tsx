@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,7 +8,8 @@ import {
   FileEdit, 
   Trash2, 
   Filter, 
-  X 
+  X,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,8 +79,6 @@ const Contracts = () => {
   const hasActiveFilters = statusFilter || departmentFilter || supplierFilter;
   
   const handleAddContract = (data: ContractFormValues) => {
-    // In a real application, you would send this data to your backend
-    // For now, we'll just add it to our local state
     const newContract: Contract = {
       id: Math.random().toString(36).substring(2, 10),
       number: data.number,
@@ -218,7 +216,6 @@ const Contracts = () => {
     <PageTransition>
       <div className="container px-4 py-6 max-w-7xl mx-auto">
         <div className="space-y-6">
-          {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Contratos</h1>
@@ -232,7 +229,6 @@ const Contracts = () => {
             </Button>
           </div>
 
-          {/* Filters */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium">Filtros</CardTitle>
@@ -352,7 +348,6 @@ const Contracts = () => {
             </CardContent>
           </Card>
 
-          {/* Contracts Table */}
           <TableWrapper 
             data={filteredContracts} 
             columns={columns} 
@@ -361,7 +356,6 @@ const Contracts = () => {
         </div>
       </div>
       
-      {/* Add Contract Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -377,7 +371,6 @@ const Contracts = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Edit Contract Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -399,7 +392,6 @@ const Contracts = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Contract Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>

@@ -14,10 +14,11 @@ import {
   Users, 
   AlertTriangle 
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import AnimatedCard from '@/components/AnimatedCard';
 import PageTransition from '@/components/PageTransition';
+import ContractExpiring from '@/components/ContractExpiring';
 import { contracts, suppliers, payments, invoices, commitments, departments } from '@/lib/data';
 import { useAuth } from '@/hooks/useAuth';
 
