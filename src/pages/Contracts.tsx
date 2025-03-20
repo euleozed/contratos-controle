@@ -1,53 +1,29 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  Plus, 
-  Search, 
-  FileText, 
-  FileEdit, 
-  Trash2, 
-  Filter, 
-  X,
-  Building2
-} from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import StatusBadge from '@/components/StatusBadge';
-import ContractForm, { ContractFormValues } from '@/components/ContractForm';
 import TableWrapper from '@/components/TableWrapper';
 import PageTransition from '@/components/PageTransition';
+import ContractForm, { ContractFormValues } from '@/components/ContractForm';
 import { Contract, contracts, departments, suppliers } from '@/lib/data';
 import { toast } from '@/hooks/use-toast';
 
+// Import refactored components
+import FilterCard from '@/components/contracts/FilterCard';
+import getContractTableColumns from '@/components/contracts/ContractTableColumns';
+import DeleteContractDialog from '@/components/contracts/DeleteContractDialog';
+
 const Contracts = () => {
   const navigate = useNavigate();
+  // State management
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [departmentFilter, setDepartmentFilter] = useState<string | null>(null);
@@ -58,6 +34,7 @@ const Contracts = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
+  // Filter contracts based on search term and filters
   const filteredContracts = contractList.filter(contract => {
     const matchesSearch = contract.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contract.supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,14 +47,14 @@ const Contracts = () => {
     return matchesSearch && matchesStatus && matchesDepartment && matchesSupplier;
   });
   
+  // Clear all filters
   const clearFilters = () => {
     setStatusFilter(null);
     setDepartmentFilter(null);
     setSupplierFilter(null);
   };
   
-  const hasActiveFilters = statusFilter || departmentFilter || supplierFilter;
-  
+  // Handlers for contracts CRUD operations
   const handleAddContract = (data: ContractFormValues) => {
     const newContract: Contract = {
       id: Math.random().toString(36).substring(2, 10),
@@ -143,74 +120,19 @@ const Contracts = () => {
     });
   };
   
-  const columns = [
-    {
-      header: 'Número',
-      accessorKey: 'number',
-    },
-    {
-      header: 'Fornecedor',
-      accessorKey: (row: Contract) => row.supplier.name,
-    },
-    {
-      header: 'Departamento',
-      accessorKey: (row: Contract) => row.department.name,
-    },
-    {
-      header: 'Valor',
-      accessorKey: (row: Contract) => new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(row.value),
-      className: 'text-right',
-    },
-    {
-      header: 'Início',
-      accessorKey: (row: Contract) => new Date(row.startDate).toLocaleDateString('pt-BR'),
-    },
-    {
-      header: 'Término',
-      accessorKey: (row: Contract) => new Date(row.endDate).toLocaleDateString('pt-BR'),
-    },
-    {
-      header: 'Status',
-      accessorKey: (row: Contract) => <StatusBadge status={row.status} />,
-    },
-    {
-      header: 'Ações',
-      accessorKey: (row: Contract) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <FileText className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Ações</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {
-              setSelectedContract(row);
-              setIsEditDialogOpen(true);
-            }}>
-              <FileEdit className="mr-2 h-4 w-4" />
-              <span>Editar</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => {
-                setSelectedContract(row);
-                setIsDeleteDialogOpen(true);
-              }}
-              className="text-red-600"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>Excluir</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-      className: 'text-center',
-    },
-  ];
+  // Handlers for opening dialogs with selected contract
+  const handleOpenEditDialog = (contract: Contract) => {
+    setSelectedContract(contract);
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleOpenDeleteDialog = (contract: Contract) => {
+    setSelectedContract(contract);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Get table columns with action handlers
+  const columns = getContractTableColumns(handleOpenEditDialog, handleOpenDeleteDialog);
 
   return (
     <PageTransition>
@@ -229,124 +151,17 @@ const Contracts = () => {
             </Button>
           </div>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium">Filtros</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="flex items-center gap-2">
-                  <Search className="h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    placeholder="Buscar por número, fornecedor..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                
-                <Select value={statusFilter || ''} onValueChange={(value) => setStatusFilter(value || null)}>
-                  <SelectTrigger className="w-full">
-                    <div className="flex items-center gap-2">
-                      <Filter className="h-4 w-4 text-muted-foreground" />
-                      <SelectValue placeholder="Status" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos os status</SelectItem>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="expired">Expirado</SelectItem>
-                    <SelectItem value="pending">Pendente</SelectItem>
-                    <SelectItem value="canceled">Cancelado</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select value={departmentFilter || ''} onValueChange={(value) => setDepartmentFilter(value || null)}>
-                  <SelectTrigger className="w-full">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <SelectValue placeholder="Departamento" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos os departamentos</SelectItem>
-                    {departments.map((department) => (
-                      <SelectItem key={department.id} value={department.id}>
-                        {department.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select value={supplierFilter || ''} onValueChange={(value) => setSupplierFilter(value || null)}>
-                  <SelectTrigger className="w-full">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      <SelectValue placeholder="Fornecedor" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos os fornecedores</SelectItem>
-                    {suppliers.map((supplier) => (
-                      <SelectItem key={supplier.id} value={supplier.id}>
-                        {supplier.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {hasActiveFilters && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <div className="flex flex-wrap gap-2">
-                    {statusFilter && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        Status: {
-                          statusFilter === 'active' ? 'Ativo' :
-                          statusFilter === 'expired' ? 'Expirado' :
-                          statusFilter === 'pending' ? 'Pendente' : 'Cancelado'
-                        }
-                        <button 
-                          onClick={() => setStatusFilter(null)} 
-                          className="ml-1 rounded-full hover:bg-muted"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    )}
-                    
-                    {departmentFilter && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        Departamento: {departments.find(d => d.id === departmentFilter)?.name}
-                        <button 
-                          onClick={() => setDepartmentFilter(null)} 
-                          className="ml-1 rounded-full hover:bg-muted"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    )}
-                    
-                    {supplierFilter && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        Fornecedor: {suppliers.find(s => s.id === supplierFilter)?.name}
-                        <button 
-                          onClick={() => setSupplierFilter(null)} 
-                          className="ml-1 rounded-full hover:bg-muted"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <Button variant="ghost" size="sm" onClick={clearFilters}>
-                    Limpar filtros
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <FilterCard 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            departmentFilter={departmentFilter}
+            setDepartmentFilter={setDepartmentFilter}
+            supplierFilter={supplierFilter}
+            setSupplierFilter={setSupplierFilter}
+            clearFilters={clearFilters}
+          />
 
           <TableWrapper 
             data={filteredContracts} 
@@ -356,6 +171,7 @@ const Contracts = () => {
         </div>
       </div>
       
+      {/* Add Contract Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -371,6 +187,7 @@ const Contracts = () => {
         </DialogContent>
       </Dialog>
       
+      {/* Edit Contract Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -392,33 +209,17 @@ const Contracts = () => {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Excluir Contrato</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir este contrato? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsDeleteDialogOpen(false);
-                setSelectedContract(null);
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDeleteContract}
-            >
-              Excluir
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Delete Contract Dialog */}
+      <DeleteContractDialog 
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        contract={selectedContract}
+        onDelete={handleDeleteContract}
+        onCancel={() => {
+          setIsDeleteDialogOpen(false);
+          setSelectedContract(null);
+        }}
+      />
     </PageTransition>
   );
 };
