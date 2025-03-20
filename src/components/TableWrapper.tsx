@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 // Define column type to be used with tables
 export interface TableColumn<T> {
   header: string;
-  accessorKey: keyof T | ((row: T) => React.ReactNode);
+  accessorKey: keyof T | string | ((row: T) => React.ReactNode);
   className?: string;
 }
 
@@ -56,9 +56,13 @@ const TableWrapper = <T extends {}>({
                   onClick={() => onRowClick && onRowClick(row)}
                 >
                   {columns.map((column, colIndex) => {
-                    const cellContent = typeof column.accessorKey === 'function'
-                      ? column.accessorKey(row)
-                      : row[column.accessorKey as keyof T] as React.ReactNode;
+                    let cellContent: React.ReactNode;
+                    
+                    if (typeof column.accessorKey === 'function') {
+                      cellContent = column.accessorKey(row);
+                    } else {
+                      cellContent = row[column.accessorKey as keyof T] as React.ReactNode;
+                    }
                       
                     return (
                       <td
