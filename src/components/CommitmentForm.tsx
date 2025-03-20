@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -174,7 +173,6 @@ const CommitmentForm: React.FC<CommitmentFormProps> = ({
                       onSelect={field.onChange}
                       initialFocus
                       locale={ptBR}
-                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>

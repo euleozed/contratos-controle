@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -160,7 +159,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                       onSelect={field.onChange}
                       initialFocus
                       locale={ptBR}
-                      className="p-3 pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
